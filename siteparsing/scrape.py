@@ -6,7 +6,7 @@ import json
 import csv
 
 # сайт парсинга
-url = "https://health-diet.ru/table_calorie/?utm_source=leftMenu&utm_medium=table_calorie"
+# url = "https://health-diet.ru/table_calorie/?utm_source=leftMenu&utm_medium=table_calorie"
 
 # создание заголовков для безопасности
 headers = {
@@ -15,52 +15,57 @@ headers = {
 }
 
 # отправляем запрос
-req = requests.get(url, headers=headers)
-src = req.text
-print(src)
+# req = requests.get(url, headers=headers)
+# src = req.text
+# print(src)
 
 # записываем данные сайта в html-файл
-with open("index.html", "w", encoding='utf-8') as file:
-    file.write(src)
+# with open("index.html", "w", encoding='utf-8') as file:
+#     file.write(src)
 
 # считываем данные
-with open("index.html", encoding='utf-8') as file:
-    src = file.read()
+# with open("index.html", encoding='utf-8') as file:
+#     src = file.read()
 
 # обрабатываем данные
-soup = BeautifulSoup(src, "lxml")
-all_products_hrefs = soup.find_all(class_="mzr-tc-group-item-href") # находим все ссылки на категории продуктов
+# soup = BeautifulSoup(src, "lxml")
+# all_products_hrefs = soup.find_all(class_="mzr-tc-group-item-href") # находим все ссылки на категории продуктов
 
-# # создаем словарь с категориями и заполняем его именами категорий+ссылка
-all_categories_dict = {}
-for item in all_products_hrefs:
-    item_text = item.text
-    item_href = "https://health-diet.ru" + item.get("href")
+# создаем словарь с категориями и заполняем его именами категорий+ссылка
+# all_categories_dict = {}
+# for item in all_products_hrefs:
+#     item_text = item.text
+#     item_href = "https://health-diet.ru" + item.get("href")
 
-    all_categories_dict[item_text] = item_href
+#     all_categories_dict[item_text] = item_href
 
 # записываем словарь в json-файл
-with open("all_categories_dict.json", "w", encoding='utf-8') as file:
-    json.dump(all_categories_dict, file, indent=4, ensure_ascii=False)
+# with open("all_categories_dict.json", "w", encoding='utf-8') as file:
+#     json.dump(all_categories_dict, file, indent=4, ensure_ascii=False)
 
 # считываем данные из json-файла
 with open("all_categories_dict.json", encoding='utf-8') as file:
     all_categories = json.load(file)
 
+# сколько всего итераций и счетчик
 iteration_count = int(len(all_categories)) - 1
 count = 0
 print(f"Всего итераций: {iteration_count}")
 
+# категория и ссылка 
 for category_name, category_href in all_categories.items():
 
-    rep = [",", " ", "-", "'"]
-    for item in rep:
-        if item in category_name:
-            category_name = category_name.replace(item, "_")
+    # заменяем неудобные символы
+    # rep = [",", " ", "-", "'"]
+    # for item in rep:
+    #     if item in category_name:
+    #         category_name = category_name.replace(item, "_")
 
-    req = requests.get(url=category_href, headers=headers)
-    src = req.text
+    # отправляем запрос по ссылке на категорию
+    # req = requests.get(url=category_href, headers=headers)
+    # src = req.text
 
+    # записываем данные со страницы
     with open(f"data/{count}_{category_name}.html", "w", encoding='utf-8') as file:
         file.write(src)
 
@@ -82,6 +87,7 @@ for category_name, category_href in all_categories.items():
     fats = table_head[3].text
     carbohydrates = table_head[4].text
 
+    # записываем данные в csv-таблицу
     with open(f"data/{count}_{category_name}.csv", "w", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(
@@ -117,6 +123,7 @@ for category_name, category_href in all_categories.items():
             }
         )
 
+        # добавляем данные продуктов в таблицу
         with open(f"data/{count}_{category_name}.csv", "a", encoding="utf-8") as file:
             writer = csv.writer(file)
             writer.writerow(
@@ -128,6 +135,8 @@ for category_name, category_href in all_categories.items():
                     carbohydrates
                 )
             )
+    
+    # записыем данные продуктов категории в json-файл
     with open(f"data/{count}_{category_name}.json", "a", encoding="utf-8") as file:
         json.dump(product_info, file, indent=4, ensure_ascii=False)
 
