@@ -4,6 +4,8 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from time import sleep
+import random
 
 # links = []
 # for i in range(0, 760, 20):
@@ -34,8 +36,9 @@ with open('links.txt', encoding='utf-8') as file:
         }
         data_dict.append(data)
         with open('data.json', 'w', encoding='utf-8') as data_json:
-            json.dump(data_dict, data_json ,indent=4)
+            json.dump(data_dict, data_json, ensure_ascii=False, indent=4)
         count += 1
         print(f'#{count}: {i} is done!')
+        sleep(random.randrange(2, 4))
         
 
